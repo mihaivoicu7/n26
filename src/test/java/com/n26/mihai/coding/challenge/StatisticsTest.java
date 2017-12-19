@@ -100,6 +100,30 @@ public class StatisticsTest {
     }
 
     @Test
+    public void testStatisticsDuplicateTransactionRemoval() throws InterruptedException {
+        //given
+        this.applicationProperties.setTransactionLifeMillis(500l);
+        BigDecimal transactionValue = new BigDecimal(15.233).setScale(applicationProperties.getDecimalScale(), BigDecimal.ROUND_HALF_EVEN);
+        TransactionDTO transactionDTO = new TransactionDTO();
+        transactionDTO.setAmount(transactionValue);
+        transactionDTO.setTimestamp(new Date());
+        //when
+        this.restTemplate.postForEntity("/transactions", transactionDTO, String.class);
+        this.restTemplate.postForEntity("/transactions", transactionDTO, String.class);
+        this.restTemplate.postForEntity("/transactions", transactionDTO, String.class);
+        this.restTemplate.postForEntity("/transactions", transactionDTO, String.class);
+        Thread.sleep(500l);
+        StatisticsDTO statistics = this.restTemplate.getForObject("/statistics", StatisticsDTO.class);
+        //then
+        assertThat(statistics).isNotNull();
+        assertThat(statistics.getCount()).isEqualTo(0);
+        assertThat(statistics.getSum()).isEqualTo(BigDecimal.ZERO);
+        assertThat(statistics.getAvg()).isEqualTo(BigDecimal.ZERO);
+        assertThat(statistics.getMin()).isNull();
+        assertThat(statistics.getMax()).isNull();
+    }
+
+    @Test
     public void testStatisticsMultipleTransactions() throws InterruptedException {
         //given
         this.applicationProperties.setTransactionLifeMillis(10000l);
