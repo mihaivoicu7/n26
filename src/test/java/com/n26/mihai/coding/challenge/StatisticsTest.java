@@ -78,7 +78,7 @@ public class StatisticsTest {
     }
 
     @Test
-    public void testStatisticsDuplicateTransaction() {
+    public void testStatisticsDuplicateTransaction() throws InterruptedException {
         //given
         this.applicationProperties.setTransactionLifeMillis(10000l);
         BigDecimal transactionValue = new BigDecimal(15.233).setScale(applicationProperties.getDecimalScale(), BigDecimal.ROUND_HALF_EVEN);
@@ -88,6 +88,7 @@ public class StatisticsTest {
         //when
         this.restTemplate.postForEntity("/transactions", transactionDTO, String.class);
         this.restTemplate.postForEntity("/transactions", transactionDTO, String.class);
+        Thread.sleep(150l);
         StatisticsDTO statistics = this.restTemplate.getForObject("/statistics", StatisticsDTO.class);
         //then
         assertThat(statistics).isNotNull();
@@ -120,7 +121,7 @@ public class StatisticsTest {
         this.restTemplate.postForEntity("/transactions", transactionDTO1, String.class);
         this.restTemplate.postForEntity("/transactions", transactionDTO2, String.class);
         this.restTemplate.postForEntity("/transactions", transactionDTO3, String.class);
-        Thread.sleep(100l);
+        Thread.sleep(150l);
         StatisticsDTO statistics = this.restTemplate.getForObject("/statistics", StatisticsDTO.class);
         //then
         assertThat(statistics).isNotNull();
@@ -142,7 +143,7 @@ public class StatisticsTest {
 
         //when
         this.restTemplate.postForEntity("/transactions", transactionDTO1, String.class);
-        Thread.sleep(100l);
+        Thread.sleep(150l);
         StatisticsDTO statistics = this.restTemplate.getForObject("/statistics", StatisticsDTO.class);
         //then
         assertThat(statistics).isNotNull();
@@ -165,7 +166,7 @@ public class StatisticsTest {
         for(int i=0;i<5;i++) {
             this.restTemplate.postForEntity("/transactions", transactionDTO1, String.class);
         }
-        Thread.sleep(100l);
+        Thread.sleep(150l);
         StatisticsDTO statistics = this.restTemplate.getForObject("/statistics", StatisticsDTO.class);
         //then
         assertThat(statistics).isNotNull();
@@ -191,7 +192,7 @@ public class StatisticsTest {
             transactionDTO.setAmount(BigDecimal.valueOf(transValue).setScale(applicationProperties.getDecimalScale(), BigDecimal.ROUND_HALF_EVEN));
             this.restTemplate.postForEntity("/transactions", transactionDTO, String.class);
         });
-        Thread.sleep(200l);
+        Thread.sleep(500l);
         StatisticsDTO statistics = this.restTemplate.getForObject("/statistics", StatisticsDTO.class);
         //then
         assertThat(statistics).isNotNull();
